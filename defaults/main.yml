@@ -1,0 +1,8 @@
+---
+# defaults file for redmine
+
+redmine_db_name: redmine
+redmine_db_user: redmine
+redmine_db_passwd: redmine
+redmine_unix_group: redmine
+redmine_unix_user: redmine

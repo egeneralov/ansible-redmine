@@ -1,0 +1,18 @@
+[Unit]
+Description=Redmine
+Documentation=http://redmine.org
+Requires=postgresql.service
+After=postgresql.service
+Before=nginx.service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/redmine/redmine-3.4.3
+User=redmine
+Group=redmine
+Environment=RAILS_ENV=production
+ExecStart=/usr/bin/bundle exec puma -C /opt/redmine/redmine-3.4.3/config/puma.rb
+
+[Install]
+WantedBy=multi-user.target
+
