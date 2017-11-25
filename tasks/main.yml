@@ -249,9 +249,12 @@
 - name: Start service
   service:
     name: redmine.service
-    state: restarted
+    state: started
 
-
+- name: Ensure service in autostart
+  shell: systemctl enable redmine.service
+  register: enable_result
+  changed_when: "'Created' in enable_result.stdout"
 
 
 
