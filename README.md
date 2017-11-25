@@ -3,10 +3,27 @@ Redmine ansible role
 
 Provision redmine installation via ansible with puma-powered backserver.
 
+Also you will get telegram notifications via plugins from centosadmin.
+
+Be careful, systemd runner for telegram-bot is unstable, you may have silient crashes. 
+
+
+For bot debug check
+-------------------
+
+- /opt/redmine/redmine-<verison>/tmp/pids
+- /opt/redmine/redmine-<verison>/log/*
+
+WARNING
+-------
+
+This playbook will replace existing pg_hba for postgres.
+
+
 Requirements
 ------------
 
-Debian 9 powered mashine
+Debian 9 power. May be will usable on Ubuntu (i thing 16+).
 
 Role Variables
 --------------
@@ -18,6 +35,8 @@ Please, see defaults/main.yml for more variables. But you must specify in playbo
 
 Example Playbook
 ----------------
+
+Tested with:
 
 	---
 	- hosts: redmine

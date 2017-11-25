@@ -1,6 +1,6 @@
 galaxy_info:
   author: Eduard Generalov <eduard@generalov.net>
-  description: Provision redmine
+  description: Provision redmine with telegram bot and sidekiq.
   company: GeneralovNet
   license: MIT
   min_ansible_version: 1.2
