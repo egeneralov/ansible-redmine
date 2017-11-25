@@ -1,0 +1,15 @@
+[Unit]
+Description=Sidekiq for redmine
+Documentation=http://redmine.org
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/redmine/redmine-3.4.3
+User=redmine
+Group=redmine
+Environment=RAILS_ENV=production
+ExecStart=/usr/bin/bundle exec sidekiq -L log/sidekiq.log -C config/sidekiq.yml -e production
+
+[Install]
+WantedBy=multi-user.target
+

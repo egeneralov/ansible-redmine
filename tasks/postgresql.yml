@@ -1,0 +1,33 @@
+---
+
+- name: Install postgres
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - postgresql-server-dev-9.6
+    - postgresql-9.6
+
+- name: Ensure redmine db user will have access to psql
+  template: 
+    src: pg_hba.conf
+    dest: /etc/postgresql/9.6/main/pg_hba.conf
+    mode: 0660
+    owner: postgres
+    group: postgres
+
+- name: Create database
+  postgresql_db:
+    name: "{{ redmine_db_name }}"
+    encoding: UTF-8
+  become: true
+  become_user: postgres
+
+- name: Create db user
+  postgresql_user:
+    db: "{{ redmine_db_name }}"
+    name: "{{ redmine_db_user }}"
+    password: "{{ redmine_db_passwd }}"
+  become: true
+  become_user: postgres

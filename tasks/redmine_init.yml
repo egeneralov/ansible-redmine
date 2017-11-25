@@ -1,0 +1,56 @@
+---
+
+- name: Redmine database configuration
+  template: 
+    src: database.yml
+    dest: "/opt/redmine/redmine-{{ redmine_version }}/config/database.yml"
+    mode: 0775
+    owner: "{{ redmine_unix_user }}"
+    group: "{{ redmine_unix_group }}"
+
+- name: Log file for redmine
+  file:
+    path: "/opt/redmine/redmine-{{ redmine_version }}/log/production.log"
+    mode: 0664
+    owner: "{{ redmine_unix_user }}"
+    group: "{{ redmine_unix_group }}"
+
+- name: Insert info about puma installation
+  lineinfile:
+    path: "/opt/redmine/redmine-{{ redmine_version }}/Gemfile"
+    insertbefore: '^gem "rails"'
+    line: 'gem "puma"'
+
+- name: Place Puma configuration
+  template:
+    src: puma.rb
+    dest: "/opt/redmine/redmine-{{ redmine_version }}/config/puma.rb"
+
+- include: bundler_install.yml
+
+- name: Migrate database
+  shell: bundle exec rake db:migrate
+  environment:
+    RAILS_ENV: production
+  args:
+    chdir: "/opt/redmine/redmine-{{ redmine_version }}"
+  changed_when: false
+# Database migration in safety, changed_when for beautify
+
+- name: Generate secret token for application
+  shell: bundle exec rake generate_secret_token
+  environment:
+    RAILS_ENV: production
+    REDMINE_LANG: ru
+  args:
+    chdir: "/opt/redmine/redmine-{{ redmine_version }}"
+    creates: "/opt/redmine/redmine-{{ redmine_version }}/config/initializers/secret_token.rb"
+
+- name: Load default data to database
+  shell: bundle exec rake redmine:load_default_data | tee load_default_data.log
+  args:
+    chdir: "/opt/redmine/redmine-{{ redmine_version }}"
+    creates: "/opt/redmine/redmine-{{ redmine_version }}/load_default_data.log"
+  environment:
+    RAILS_ENV: production
+    REDMINE_LANG: ru

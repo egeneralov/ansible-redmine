@@ -1,0 +1,7 @@
+---
+
+
+- name: "Ensure {{ item }} service in autostart"
+  shell: "systemctl enable {{ item }}.service"
+  register: enable_result
+  changed_when: "'Created' in enable_result.stdout"

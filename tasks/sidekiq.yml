@@ -1,0 +1,11 @@
+---
+
+- name: Place redmine sidekiq
+  git:
+    repo: "https://github.com/ogom/redmine_sidekiq"
+    dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/redmine_sidekiq"
+    update: no
+
+- include: bundler_install.yml
+- include: migrate_plugins.yml
+

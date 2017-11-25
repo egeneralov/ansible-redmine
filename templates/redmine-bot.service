@@ -1,0 +1,15 @@
+[Unit]
+Description=Redmine telegram bot
+Documentation=http://redmine.org
+
+[Service]
+Type=forking
+WorkingDirectory=/opt/redmine/redmine-3.4.3
+User=redmine
+Group=redmine
+Environment=RAILS_ENV=production
+ExecStart=/bin/bash -c "/usr/local/bin/rake intouch:telegram:bot --trace"
+
+[Install]
+WantedBy=multi-user.target
+

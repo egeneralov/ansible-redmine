@@ -1,0 +1,10 @@
+---
+
+- name: Permissions for user to redmine folder
+  file:
+    path: /opt/redmine
+    recurse: yes
+    mode: 0775
+    owner: "{{ redmine_unix_user }}"
+    group: "{{ redmine_unix_group }}"
+  changed_when: false

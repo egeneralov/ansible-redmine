@@ -1,0 +1,11 @@
+---
+
+- include: bundler_install.yml
+
+- name: Migrate plugins
+  shell: bundle exec rake redmine:plugins:migrate
+  environment:
+    RAILS_ENV: production
+  args:
+    chdir: "/opt/redmine/redmine-{{ redmine_version }}"
+  changed_when: false

@@ -1,0 +1,10 @@
+---
+
+- name: "Place {{ item }} systemd service"
+  template:
+    src: "{{ item }}.service"
+    dest: "/etc/systemd/system/{{ item }}.service"
+
+- name: Reload systemd
+  shell: systemctl daemon-reload
+  changed_when: false

@@ -1,104 +1,21 @@
 ---
 # tasks file for redmine
 
-- name: Install ansible deps
-  apt:
-    name: "{{ item }}"
-    state: present
-    update_cache: yes
-    cache_valid_time: 36000
-  with_items:
-    - python-pip
-    - sudo
+- include: apt.yml
+- include: nginx.yml
+- include: postgresql.yml
+- include: unix.yml
 
-- name: Install ansible deps (pip)
-  pip:
-    name: psycopg2
-    state: present
 
-- name: Install ruby
-  apt:
-    name: "{{ item }}"
-    state: present
-    update_cache: yes
-    cache_valid_time: 36000
-  with_items:
-    - ruby
-    - ruby-dev
-    - rails
-    - gem
-    - ruby-zip
-    - imagemagick
-
-- name: Install build tools
-  apt:
-    name: "{{ item }}"
-    state: present
-    update_cache: yes
-    cache_valid_time: 36000
-  with_items:
-    - build-essential
-    - autoconf
-    - checkinstall
-    - zlib1g-dev
-    - zlib1g
-    - zlibc
-
-- name: Install libs source
-  apt:
-    name: "{{ item }}"
-    state: present
-    update_cache: yes
-    cache_valid_time: 36000
-  with_items:
-    - libssl-dev
-    - libyaml-dev
-    - libcurl4-openssl-dev
-    - libapr1-dev
-    - libxslt1-dev
-    - libxml2-dev
-    - libmagickwand-dev
-
-- name: Ensure nginx installed
-  apt:
-    name: nginx
-    state: installed
-  register: nginx_installation
-
-- name: Purge default site nginx configuration
-  file:
-    state: absent
-    path: "{{ item }}"
-  with_items:
-    - /etc/nginx/sites-enabled/default
-    -  /etc/nginx/sites-available/default
-  when: nginx_installation.changed
-
-- name: Place nginx redmine configuration
-  template:
-    src: redmine.conf
-    dest: "/etc/nginx/sites-available/{{ domain }}"
-  register: nginx_redmine
-
-- name: Place symbolic link
-  file:
-    state: link
-    src: "/etc/nginx/sites-available/{{ domain }}"
-    dest: "/etc/nginx/sites-enabled/{{ domain }}"
-
-- name: Reload nginx
-  service:
-    name: nginx
-    state: reloaded
-  when: nginx_redmine.changed
-
-- name: Ensure redmine directory presented
+- name: Ensure redmine dir's presented
   file:
     path: "{{ item }}"
     state: directory
   with_items:
     - /opt/redmine
     - "/opt/redmine/redmine-{{ redmine_version }}/tmp/pids/"
+
+- include: fix_permissions.yml
 
 - name: "Download redmine {{ redmine_version }}"
   get_url:
@@ -113,149 +30,39 @@
     remote_src: yes
   when: DownloadRedmineTGZ.changed
 
-- name: Install postgres
-  apt:
-    name: "{{ item }}"
-    state: present
-    update_cache: yes
+
+- include: fix_permissions.yml
+- include: redmine_init.yml
+- include: sidekiq.yml
+
+- include: centosadmin_plugins.yml
   with_items:
-    - postgresql-server-dev-9.6
-    - postgresql-9.6
+    - redmine_telegram_common
+    - redmine_intouch
 
-- name: Ensure PSQL is running
-  service:
-    name: postgresql
-    state: started
-  register: db_installation
+- name: Copy sidekq configuration
+  copy:
+    src: "/opt/redmine/redmine-{{ redmine_version }}/plugins/redmine_intouch/extras/sidekiq.yml"
+    dest: "/opt/redmine/redmine-{{ redmine_version }}/config"
+    remote_src: true
 
-- name: Ensure redmine db user will have access to psql
-  template: 
-    src: pg_hba.conf
-    dest: /etc/postgresql/9.6/main/pg_hba.conf
-    mode: 0660
-    owner: postgres
-    group: postgres
-  register: pg_hba
+- include: place_service.yml
+  with_items:
+    - redmine
+    - redmine-bot
+    - sidekiq
 
-- name: Reload PSQL for apply changes
-  service:
-    name: postgresql
-    state: reloaded
-  when: pg_hba.changed
+- include: service_autostart.yml
+  with_items:
+    - redmine
+    - redis-server
+    - sidekiq
+    - redmine-bot
 
-- name: Create database
-  postgresql_db:
-    name: "{{ redmine_db_name }}"
-    encoding: UTF-8
-  become: true
-  become_user: postgres
-
-- name: Create db user
-  postgresql_user:
-    db: "{{ redmine_db_name }}"
-    name: "{{ redmine_db_user }}"
-    password: "{{ redmine_db_passwd }}"
-  become: true
-  become_user: postgres
-
-- name: Create unix group
-  group:
-    name: "{{ redmine_unix_group }}"
-    state: present
-
-- name: Create unix user
-  user:
-    name: "{{ redmine_unix_user }}"
-    shell: /bin/bash
-    groups: "{{ redmine_unix_group }}"
-    append: yes
-
-- name: Redmine database configuration
-  template: 
-    src: database.yml
-    dest: "/opt/redmine/redmine-{{ redmine_version }}/config/database.yml"
-    mode: 0775
-    owner: "{{ redmine_unix_user }}"
-    group: "{{ redmine_unix_group }}"
-
-- name: Info about Gemfile.lock
-  stat:
-    path: "/opt/redmine/redmine-{{ redmine_version }}/Gemfile.lock"
-  register: Gemfile
-
-- name: Insert info about puma installation
-  lineinfile:
-    path: "/opt/redmine/redmine-{{ redmine_version }}/Gemfile"
-    insertbefore: '^gem "rails"'
-    line: 'gem "puma"'
-  when: Gemfile.stat.islnk is not defined
-
-- name: Install gems
-  bundler:
-    state: present
-    chdir: "/opt/redmine/redmine-{{ redmine_version }}"
-  when: Gemfile.stat.islnk is not defined
-
-- name: Migrate database
-  shell: bundle exec rake db:migrate
-  environment:
-    RAILS_ENV: production
-  args:
-    chdir: "/opt/redmine/redmine-{{ redmine_version }}"
-  changed_when: false
-# Database migration in safety, changed_when for beautify
-
-- name: Generate secret token for application
-  shell: bundle exec rake generate_secret_token
-  environment:
-    RAILS_ENV: production
-    REDMINE_LANG: ru
-  args:
-    chdir: "/opt/redmine/redmine-{{ redmine_version }}"
-    creates: "/opt/redmine/redmine-{{ redmine_version }}/config/initializers/secret_token.rb"
-
-- name: Load default data to database
-  shell: bundle exec rake redmine:load_default_data | tee load_default_data.log
-  args:
-    chdir: "/opt/redmine/redmine-{{ redmine_version }}"
-    creates: "/opt/redmine/redmine-{{ redmine_version }}/load_default_data.log"
-  environment:
-    RAILS_ENV: production
-    REDMINE_LANG: ru
-
-- name: Permissions for user to redmine folder
-  file:
-    path: /opt/redmine
-    recurse: yes
-    mode: 0775
-    owner: "{{ redmine_unix_user }}"
-    group: "{{ redmine_unix_group }}"
-  changed_when: false
-
-- name: Place Puma configuration
-  template:
-    src: puma.rb
-    dest: "/opt/redmine/redmine-{{ redmine_version }}/config/puma.rb"
-
-- name: Place systemd service
-  template:
-    src: systemd.service
-    dest: /etc/systemd/system/redmine.service
-
-- name: Reload systemd
-  shell: systemctl daemon-reload
-  changed_when: false
-
-- name: Start service
-  service:
-    name: redmine.service
-    state: started
-
-- name: Ensure service in autostart
-  shell: systemctl enable redmine.service
-  register: enable_result
-  changed_when: "'Created' in enable_result.stdout"
-
-
-
+- include: start_service.yml
+  with_items:
+    - redmine
+    - redis-server
+    - sidekiq
+    - redmine-bot
 

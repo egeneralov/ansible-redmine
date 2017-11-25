@@ -1,0 +1,13 @@
+---
+
+- name: Create unix group
+  group:
+    name: "{{ redmine_unix_group }}"
+    state: present
+
+- name: Create unix user
+  user:
+    name: "{{ redmine_unix_user }}"
+    shell: /bin/bash
+    groups: "{{ redmine_unix_group }}"
+    append: yes

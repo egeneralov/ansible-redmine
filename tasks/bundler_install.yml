@@ -1,0 +1,6 @@
+---
+
+- name: Install requement gems
+  bundler:
+    state: present
+    chdir: "/opt/redmine/redmine-{{ redmine_version }}"
