@@ -94,8 +94,11 @@
 
 - name: Ensure redmine directory presented
   file:
-    path: /opt/redmine
+    path: "{{ item }}"
     state: directory
+  with_items:
+    - /opt/redmine
+    - "/opt/redmine/redmine-{{ redmine_version }}/tmp/pids/"
 
 - name: "Download redmine {{ redmine_version }}"
   get_url:
