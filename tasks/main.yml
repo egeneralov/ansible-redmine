@@ -76,6 +76,9 @@
     - https://github.com/tsi/redmine-theme-flat/archive/master.zip
     - https://github.com/themondays/Dwarf/archive/master.zip
     - https://github.com/mrliptontea/PurpleMine2/archive/master.zip
+  changed_when: false
+
+- include: fix_permissions.yml
 
 - include: start_service.yml
   with_items:
@@ -84,8 +87,6 @@
     - sidekiq
 #     - redmine-bot
 
-- include: fix_permissions.yml
-
-# - service:
-#     name: redmine
-#     state: restarted
+- service:
+    name: redmine
+    state: restarted

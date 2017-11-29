@@ -54,7 +54,6 @@
 
 
 ### Add Rails.application.config.assets.precompile += %w( zeroclipboard.js ) to config/initializers/assets.rb and restart your server.
-### UNTESTED
 - file:
     path: /opt/redmine/redmine-3.4.3/config/initializers/assets.rb
     state: touch
@@ -73,5 +72,6 @@
   register: plugin
 - include: migrate_plugins.yml
   when: plugin.changed
+
 
 

@@ -8,17 +8,31 @@
     owner: "{{ redmine_unix_user }}"
     group: "{{ redmine_unix_group }}"
   with_items:
-    - "/opt/redmine/redmine-{{ redmine_version }}/log/telegram_common/telegram-cli.log"
     - "/opt/redmine/redmine-{{ redmine_version }}/config/database.yml"
 
-
-- name: Log file for redmine
+- name: Create dirs
   file:
-    path: "/opt/redmine/redmine-{{ redmine_version }}/log/production.log"
+    path: "{{ item }}"
+    state: directory
+    mode: 0775
+    owner: "{{ redmine_unix_user }}"
+    group: "{{ redmine_unix_group }}"
+  with_items:
+    - "/opt/redmine/redmine-{{ redmine_version }}/log/telegram_common/"
+    - "/opt/redmine/redmine-{{ redmine_version }}/log/intouch/"
+    - "/opt/redmine/redmine-{{ redmine_version }}/log/redmine_2fa/"
+
+- name: Log files for redmine
+  file:
+    path: "{{ item }}"
     state: touch
     mode: 0775
     owner: "{{ redmine_unix_user }}"
     group: "{{ redmine_unix_group }}"
+  with_items:
+    - "/opt/redmine/redmine-{{ redmine_version }}/log/telegram_common/telegram-cli.log"
+    - "/opt/redmine/redmine-{{ redmine_version }}/log/production.log"
+    - "/opt/redmine/redmine-{{ redmine_version }}/log/redmine_2fa/bot-update.log"
 
 - name: Insert info about puma installation
   lineinfile:
