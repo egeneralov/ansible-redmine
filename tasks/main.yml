@@ -2,7 +2,7 @@
 # tasks file for redmine
 
 - include: apt.yml
-# - include: nginx.yml
+- include: nginx.yml
 - include: postgresql.yml
 - include: unix.yml
 - include: files_and_folders.yml
