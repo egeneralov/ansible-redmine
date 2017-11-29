@@ -1,0 +1,31 @@
+---
+
+- name: Create dirs
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0775
+    owner: "{{ redmine_unix_user }}"
+    group: "{{ redmine_unix_group }}"
+  with_items:
+    - /opt/redmine
+    - "/opt/redmine/redmine-{{ redmine_version }}"
+    - "/opt/redmine/redmine-{{ redmine_version }}/tmp/pids/"
+    - "/opt/redmine/redmine-{{ redmine_version }}/log/telegram_common/"
+    - "/opt/redmine/redmine-{{ redmine_version }}/log/intouch/"
+    - "/opt/redmine/redmine-{{ redmine_version }}/log/redmine_2fa/"
+  changed_when: false
+
+- name: Log files for redmine
+  file:
+    path: "{{ item }}"
+    state: touch
+    mode: 0775
+    owner: "{{ redmine_unix_user }}"
+    group: "{{ redmine_unix_group }}"
+  with_items:
+    - "/opt/redmine/redmine-{{ redmine_version }}/log/telegram_common/telegram-cli.log"
+    - "/opt/redmine/redmine-{{ redmine_version }}/log/production.log"
+    - "/opt/redmine/redmine-{{ redmine_version }}/log/redmine_2fa/bot-update.log"
+  changed_when: false
+

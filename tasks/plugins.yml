@@ -1,6 +1,34 @@
 ---
 
-- name: "Place redmine_mentions plugin"
+- name: "[PLUGIN] Place redmine_sidekiq"
+  git:
+    repo: "https://github.com/ogom/redmine_sidekiq"
+    dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/redmine_sidekiq"
+    update: no
+  register: plugin
+- include: migrate_plugins.yml
+  when: plugin.changed
+
+- name: "Place {{ item }} plugin"
+  git:
+    repo: "https://github.com/centosadmin/{{ item }}.git"
+    dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/{{ item }}"
+    update: no
+  with_items:
+    - redmine_telegram_common
+    - redmine_intouch
+    - redmine_2fa
+  register: plugin
+- include: migrate_plugins.yml
+  when: plugin.changed
+
+- name: Copy sidekq configuration
+  copy:
+    src: "/opt/redmine/redmine-{{ redmine_version }}/plugins/redmine_intouch/extras/sidekiq.yml"
+    dest: "/opt/redmine/redmine-{{ redmine_version }}/config"
+    remote_src: true
+
+- name: "[PLUGIN] Place redmine_mentions plugin"
   git:
     repo: https://github.com/arkhitech/redmine_mentions.git
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/redmine_mentions"
@@ -9,7 +37,7 @@
 - include: migrate_plugins.yml
   when: plugin.changed
 
-- name: "Place progressive_projects_list plugin"
+- name: "[PLUGIN] Place progressive_projects_list plugin"
   git:
     repo: https://github.com/stgeneral/redmine-progressive-projects-list.git
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/progressive_projects_list"
@@ -18,7 +46,7 @@
 - include: migrate_plugins.yml
   when: plugin.changed
 
-- name: "Place collapsed-journals plugin"
+- name: "[PLUGIN] Place collapsed-journals plugin"
   git:
     repo: https://github.com/stgeneral/redmine-collapsed-journals.git
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/collapsed_journals"
@@ -28,7 +56,7 @@
   when: plugin.changed
 
 
-- name: "Place redmine_timelog_timer plugin"
+- name: "[PLUGIN] Place redmine_timelog_timer plugin"
   git:
     repo: https://github.com/behigh/redmine_timelog_timer.git
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/timelog_timer"
@@ -37,13 +65,13 @@
 - include: migrate_plugins.yml
   when: plugin.changed
 
-- name: "Place line_numbers plugin"
+- name: "[PLUGIN] Place line_numbers plugin"
   git:
     repo: https://github.com/cdwertmann/line_numbers.git
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/line_numbers"
     update: no
 
-- name: "Place codebutton plugin"
+- name: "[PLUGIN] Place codebutton plugin"
   git:
     repo: https://github.com/mediatainment/redmine_codebutton.git
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/codebutton"
@@ -53,18 +81,23 @@
   when: plugin.changed
 
 
-### Add Rails.application.config.assets.precompile += %w( zeroclipboard.js ) to config/initializers/assets.rb and restart your server.
-- file:
+## Vault plugin
+### 1. Adding Rails.application.config.assets.precompile += %w( zeroclipboard.js ) to config/initializers/assets.rb
+- name: "Ensure assets config exist"
+  file:
     path: /opt/redmine/redmine-3.4.3/config/initializers/assets.rb
     state: touch
-- lineinfile:
+  changed_when: false
+
+- name: "Add vault .js to assets"
+  lineinfile:
     path: /opt/redmine/redmine-3.4.3/config/initializers/assets.rb
     insertbefore: EOF
     line: "Rails.application.config.assets.precompile += %w( zeroclipboard.js )"
     state: present
 
-### After installing a plugin, open the settings ( http://*/settings/plugin/vault ) and enter encryption key in the Encryption key field.
-- name: "Place vault plugin"
+### 2. Installing plugin
+- name: "[PLUGIN] Place vault plugin"
   git:
     repo: https://github.com/noshutdown-ru/vault.git
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/vault"
@@ -72,6 +105,8 @@
   register: plugin
 - include: migrate_plugins.yml
   when: plugin.changed
+
+### After installing a plugin, open the settings ( http://*/settings/plugin/vault ) and enter encryption key in the Encryption key field.
 
 
 

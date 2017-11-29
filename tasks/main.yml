@@ -2,74 +2,15 @@
 # tasks file for redmine
 
 - include: apt.yml
-- include: nginx.yml
+# - include: nginx.yml
 - include: postgresql.yml
 - include: unix.yml
-
-
-- name: Ensure redmine dir's presented
-  file:
-    path: "{{ item }}"
-    state: directory
-  with_items:
-    - /opt/redmine
-    - "/opt/redmine/redmine-{{ redmine_version }}/tmp/pids/"
-
+- include: files_and_folders.yml
 - include: fix_permissions.yml
-
-- name: "Download redmine {{ redmine_version }}"
-  get_url:
-    url: "http://www.redmine.org/releases/redmine-{{ redmine_version }}.tar.gz"
-    dest: "/opt/redmine/redmine-{{ redmine_version }}.tar.gz"
-  register: DownloadRedmineTGZ
-
-- name: Unpack redmine
-  unarchive:
-    src: "/opt/redmine/redmine-{{ redmine_version }}.tar.gz"
-    dest: /opt/redmine
-    remote_src: yes
-  when: DownloadRedmineTGZ.changed
-
-
-- include: fix_permissions.yml
+- include: download_and_unpack.yml
 - include: redmine_init.yml
-- include: sidekiq.yml
-
-- include: centosadmin_plugins.yml
-  with_items:
-    - redmine_telegram_common
-    - redmine_intouch
-    - redmine_2fa
-- file:
-    path: /opt/redmine/redmine-3.4.3/log/redmine_2fa/bot-update.log
-    state: touch
-    mode: 0777
-
 - include: plugins.yml
-
-- name: Copy sidekq configuration
-  copy:
-    src: "/opt/redmine/redmine-{{ redmine_version }}/plugins/redmine_intouch/extras/sidekiq.yml"
-    dest: "/opt/redmine/redmine-{{ redmine_version }}/config"
-    remote_src: true
-
-- include: place_service.yml
-  with_items:
-    - redmine
-    - redmine-bot
-    - sidekiq
-
-- template:
-    src: start_bot.sh
-    dest: "/opt/redmine/redmine-{{ redmine_version }}/start_bot.sh"
-    mode: 0777
-
-- include: service_autostart.yml
-  with_items:
-    - redmine
-    - redis-server
-    - sidekiq
-    - redmine-bot
+- include: services_manager.yml
 
 - include: themes.yml
   with_items:
@@ -87,6 +28,7 @@
     - sidekiq
 #     - redmine-bot
 
-- service:
+- name: Restart redmine
+  service:
     name: redmine
     state: restarted

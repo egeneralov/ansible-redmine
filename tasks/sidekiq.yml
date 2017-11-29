@@ -9,3 +9,9 @@
 - include: bundler_install.yml
 - include: migrate_plugins.yml
 
+- name: Copy sidekq configuration
+  copy:
+    src: "/opt/redmine/redmine-{{ redmine_version }}/plugins/redmine_intouch/extras/sidekiq.yml"
+    dest: "/opt/redmine/redmine-{{ redmine_version }}/config"
+    remote_src: true
+

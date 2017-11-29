@@ -1,6 +1,7 @@
 ---
 
-- unarchive:
+- name: "Install theme from {{ item }}"
+  unarchive:
     src: "{{ item }}"
     dest: "/opt/redmine/redmine-{{ redmine_version }}/public/themes/"
     remote_src: yes

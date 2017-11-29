@@ -1,39 +1,5 @@
 ---
 
-- name: Redmine database configuration
-  template: 
-    src: database.yml
-    dest: "/opt/redmine/redmine-{{ redmine_version }}/config/database.yml"
-    mode: 0775
-    owner: "{{ redmine_unix_user }}"
-    group: "{{ redmine_unix_group }}"
-  with_items:
-    - "/opt/redmine/redmine-{{ redmine_version }}/config/database.yml"
-
-- name: Create dirs
-  file:
-    path: "{{ item }}"
-    state: directory
-    mode: 0775
-    owner: "{{ redmine_unix_user }}"
-    group: "{{ redmine_unix_group }}"
-  with_items:
-    - "/opt/redmine/redmine-{{ redmine_version }}/log/telegram_common/"
-    - "/opt/redmine/redmine-{{ redmine_version }}/log/intouch/"
-    - "/opt/redmine/redmine-{{ redmine_version }}/log/redmine_2fa/"
-
-- name: Log files for redmine
-  file:
-    path: "{{ item }}"
-    state: touch
-    mode: 0775
-    owner: "{{ redmine_unix_user }}"
-    group: "{{ redmine_unix_group }}"
-  with_items:
-    - "/opt/redmine/redmine-{{ redmine_version }}/log/telegram_common/telegram-cli.log"
-    - "/opt/redmine/redmine-{{ redmine_version }}/log/production.log"
-    - "/opt/redmine/redmine-{{ redmine_version }}/log/redmine_2fa/bot-update.log"
-
 - name: Insert info about puma installation
   lineinfile:
     path: "/opt/redmine/redmine-{{ redmine_version }}/Gemfile"
@@ -46,6 +12,16 @@
     dest: "/opt/redmine/redmine-{{ redmine_version }}/config/puma.rb"
 
 - include: bundler_install.yml
+
+- name: Redmine database configuration
+  template: 
+    src: database.yml
+    dest: "/opt/redmine/redmine-{{ redmine_version }}/config/database.yml"
+    mode: 0775
+    owner: "{{ redmine_unix_user }}"
+    group: "{{ redmine_unix_group }}"
+  with_items:
+    - "/opt/redmine/redmine-{{ redmine_version }}/config/database.yml"
 
 - name: Migrate database
   shell: bundle exec rake db:migrate

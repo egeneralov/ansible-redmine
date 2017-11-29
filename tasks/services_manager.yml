@@ -1,0 +1,23 @@
+---
+
+
+- include: place_service.yml
+  with_items:
+    - redmine
+    - redmine-bot
+    - sidekiq
+
+- name: Ensure we have bot entrypoint for getUpdates
+  template:
+    src: start_bot.sh
+    dest: "/opt/redmine/redmine-{{ redmine_version }}/start_bot.sh"
+    mode: 0777
+  changed_when: false
+
+- include: service_autostart.yml
+  with_items:
+    - redmine
+    - redis-server
+    - sidekiq
+    - redmine-bot
+

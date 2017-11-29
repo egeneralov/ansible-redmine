@@ -1,0 +1,15 @@
+---
+
+- name: "Download redmine {{ redmine_version }}"
+  get_url:
+    url: "http://www.redmine.org/releases/redmine-{{ redmine_version }}.tar.gz"
+    dest: "/opt/redmine/redmine-{{ redmine_version }}.tar.gz"
+  register: DownloadRedmineTGZ
+
+- name: Unpack redmine
+  unarchive:
+    src: "/opt/redmine/redmine-{{ redmine_version }}.tar.gz"
+    dest: /opt/redmine
+    remote_src: yes
+  when: DownloadRedmineTGZ.changed
+
