@@ -7,11 +7,16 @@
     mode: 0775
     owner: "{{ redmine_unix_user }}"
     group: "{{ redmine_unix_group }}"
+  with_items:
+    - "/opt/redmine/redmine-{{ redmine_version }}/log/telegram_common/telegram-cli.log"
+    - "/opt/redmine/redmine-{{ redmine_version }}/config/database.yml"
+
 
 - name: Log file for redmine
   file:
     path: "/opt/redmine/redmine-{{ redmine_version }}/log/production.log"
-    mode: 0664
+    state: touch
+    mode: 0775
     owner: "{{ redmine_unix_user }}"
     group: "{{ redmine_unix_group }}"
 

@@ -10,7 +10,6 @@ Group=redmine
 PIDFile=/opt/redmine/redmine-{{ redmine_version }}/tmp/pids/telegram-bot.pid
 Environment=RAILS_ENV=production
 ExecStart=/opt/redmine/redmine-{{ redmine_version }}/start_bot.sh
-ExecReload=/bin/kill -HUP $MAINPID
 
 [Install]
 WantedBy=multi-user.target

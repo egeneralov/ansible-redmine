@@ -1,0 +1,38 @@
+---
+
+- apt:
+    name: apt-transport-https
+    state: installed
+
+- apt_repository:
+    repo: deb https://packages.groonga.org/debian/ stretch main
+    state: present
+  ignore_errors: true
+
+- shell: apt-get update -qq
+  ignore_errors: true
+
+- shell: apt-get install groonga-keyring -yq
+  ignore_errors: true
+
+- apt:
+    update_cache: true
+    name: postgresql-9.6-pgroonga
+    state: installed
+
+- shell: "psql --command 'CREATE EXTENSION pgroonga;' {{ redmine_db_name }}"
+  become: yes
+  become_user: postgres
+  ignore_errors: true
+  register: psql_ext
+
+
+- name: "Place full_text_search plugin"
+  git:
+    repo: https://github.com/okkez/redmine_full_text_search.git
+    dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/full_text_search"
+    update: no
+  register: plugin
+- include: migrate_plugins.yml
+  when: plugin.changed
+

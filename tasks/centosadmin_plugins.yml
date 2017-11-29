@@ -6,6 +6,5 @@
     repo: "https://github.com/centosadmin/{{ item }}.git"
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/{{ item }}"
     update: no
-  register: redmine_intouch
 
 - include: migrate_plugins.yml

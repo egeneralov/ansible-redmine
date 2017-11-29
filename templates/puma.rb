@@ -6,7 +6,7 @@
 # uncomment and customize to run in non-root path
 # ENV['RAILS_RELATIVE_URL_ROOT'] = "/redmine"
 
-application_path = '/opt/redmine/redmine-3.4.3'
+application_path = '/opt/redmine/redmine-{{ redmine_version }}'
 
 # The directory to operate out of.
 #

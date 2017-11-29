@@ -39,6 +39,13 @@
   with_items:
     - redmine_telegram_common
     - redmine_intouch
+    - redmine_2fa
+- file:
+    path: /opt/redmine/redmine-3.4.3/log/redmine_2fa/bot-update.log
+    state: touch
+    mode: 0777
+
+- include: plugins.yml
 
 - name: Copy sidekq configuration
   copy:
@@ -52,6 +59,11 @@
     - redmine-bot
     - sidekiq
 
+- template:
+    src: start_bot.sh
+    dest: "/opt/redmine/redmine-{{ redmine_version }}/start_bot.sh"
+    mode: 0777
+
 - include: service_autostart.yml
   with_items:
     - redmine
@@ -59,10 +71,21 @@
     - sidekiq
     - redmine-bot
 
+- include: themes.yml
+  with_items:
+    - https://github.com/tsi/redmine-theme-flat/archive/master.zip
+    - https://github.com/themondays/Dwarf/archive/master.zip
+    - https://github.com/mrliptontea/PurpleMine2/archive/master.zip
+
 - include: start_service.yml
   with_items:
     - redmine
     - redis-server
     - sidekiq
-    - redmine-bot
+#     - redmine-bot
 
+- include: fix_permissions.yml
+
+# - service:
+#     name: redmine
+#     state: restarted

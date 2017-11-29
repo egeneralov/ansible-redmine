@@ -4,7 +4,7 @@ Documentation=http://redmine.org
 
 [Service]
 Type=simple
-WorkingDirectory=/opt/redmine/redmine-3.4.3
+WorkingDirectory=/opt/redmine/redmine-{{ redmine_version }}
 User=redmine
 Group=redmine
 Environment=RAILS_ENV=production

@@ -7,11 +7,11 @@ Before=nginx.service
 
 [Service]
 Type=simple
-WorkingDirectory=/opt/redmine/redmine-3.4.3
+WorkingDirectory=/opt/redmine/redmine-{{ redmine_version }}
 User=redmine
 Group=redmine
 Environment=RAILS_ENV=production
-ExecStart=/usr/bin/bundle exec puma -C /opt/redmine/redmine-3.4.3/config/puma.rb
+ExecStart=/usr/bin/bundle exec puma -C /opt/redmine/redmine-{{ redmine_version }}/config/puma.rb
 
 [Install]
 WantedBy=multi-user.target

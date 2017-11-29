@@ -1,0 +1,7 @@
+---
+
+- unarchive:
+    src: "{{ item }}"
+    dest: "/opt/redmine/redmine-{{ redmine_version }}/public/themes/"
+    remote_src: yes
+

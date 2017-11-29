@@ -1,0 +1,77 @@
+---
+
+- name: "Place redmine_mentions plugin"
+  git:
+    repo: https://github.com/arkhitech/redmine_mentions.git
+    dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/redmine_mentions"
+    update: no
+  register: plugin
+- include: migrate_plugins.yml
+  when: plugin.changed
+
+- name: "Place progressive_projects_list plugin"
+  git:
+    repo: https://github.com/stgeneral/redmine-progressive-projects-list.git
+    dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/progressive_projects_list"
+    update: no
+  register: plugin
+- include: migrate_plugins.yml
+  when: plugin.changed
+
+- name: "Place collapsed-journals plugin"
+  git:
+    repo: https://github.com/stgeneral/redmine-collapsed-journals.git
+    dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/collapsed_journals"
+    update: no
+  register: plugin
+- include: migrate_plugins.yml
+  when: plugin.changed
+
+
+- name: "Place redmine_timelog_timer plugin"
+  git:
+    repo: https://github.com/behigh/redmine_timelog_timer.git
+    dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/timelog_timer"
+    update: no
+  register: plugin
+- include: migrate_plugins.yml
+  when: plugin.changed
+
+- name: "Place line_numbers plugin"
+  git:
+    repo: https://github.com/cdwertmann/line_numbers.git
+    dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/line_numbers"
+    update: no
+
+- name: "Place codebutton plugin"
+  git:
+    repo: https://github.com/mediatainment/redmine_codebutton.git
+    dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/codebutton"
+    update: no
+  register: plugin
+- include: migrate_plugins.yml
+  when: plugin.changed
+
+
+### Add Rails.application.config.assets.precompile += %w( zeroclipboard.js ) to config/initializers/assets.rb and restart your server.
+### UNTESTED
+- file:
+    path: /opt/redmine/redmine-3.4.3/config/initializers/assets.rb
+    state: touch
+- lineinfile:
+    path: /opt/redmine/redmine-3.4.3/config/initializers/assets.rb
+    insertbefore: EOF
+    line: "Rails.application.config.assets.precompile += %w( zeroclipboard.js )"
+    state: present
+
+### After installing a plugin, open the settings ( http://*/settings/plugin/vault ) and enter encryption key in the Encryption key field.
+- name: "Place vault plugin"
+  git:
+    repo: https://github.com/noshutdown-ru/vault.git
+    dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/vault"
+    update: no
+  register: plugin
+- include: migrate_plugins.yml
+  when: plugin.changed
+
+
