@@ -11,3 +11,5 @@
     dest: "/opt/redmine/redmine-{{ redmine_version }}/public/themes/"
     remote_src: yes
   when: theme.stat.islnk is not defined
+  async: 60
+  poll: 0

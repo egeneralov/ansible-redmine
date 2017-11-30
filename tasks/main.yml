@@ -9,8 +9,6 @@
 - include: fix_permissions.yml
 - include: download_and_unpack.yml
 - include: redmine_init.yml
-- include: plugins.yml
-- include: services_manager.yml
 - include: themes.yml
   with_items:
     - https://github.com/tsi/redmine-theme-flat/archive/master.zip
@@ -23,6 +21,8 @@
     - https://github.com/makotokw/redmine-theme-gitmike/archive/master.zip
     - https://github.com/jjanusch/minelab/archive/master.zip
     - https://github.com/stgeneral/redmine-progressive-projects-list/archive/master.zip
+- include: plugins.yml
+- include: services_manager.yml
 - include: fix_permissions.yml
 - include: start_service.yml
   with_items:
