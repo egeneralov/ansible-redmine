@@ -1,6 +1,7 @@
 ---
 
-- name: "[PLUGIN] Place redmine_sidekiq"
+# Sidekiq
+- name: "[PLUGIN] Install redmine_sidekiq"
   git:
     repo: "https://github.com/ogom/redmine_sidekiq"
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/redmine_sidekiq"
@@ -9,7 +10,8 @@
 - include: migrate_plugins.yml
   when: plugin.changed
 
-- name: "Place {{ item }} plugin"
+# Telegram
+- name: "[PLUGIN] Install centosadmin plugin"
   git:
     repo: "https://github.com/centosadmin/{{ item }}.git"
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/{{ item }}"
@@ -22,13 +24,14 @@
 - include: migrate_plugins.yml
   when: plugin.changed
 
-- name: Copy sidekq configuration
+- name: "[PLUGIN configuration] Copy sidekq configuration"
   copy:
     src: "/opt/redmine/redmine-{{ redmine_version }}/plugins/redmine_intouch/extras/sidekiq.yml"
     dest: "/opt/redmine/redmine-{{ redmine_version }}/config"
     remote_src: true
 
-- name: "[PLUGIN] Place redmine_mentions plugin"
+# Users mention in redmine issues
+- name: "[PLUGIN] Install https://github.com/arkhitech/redmine_mentions"
   git:
     repo: https://github.com/arkhitech/redmine_mentions.git
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/redmine_mentions"
@@ -37,7 +40,7 @@
 - include: migrate_plugins.yml
   when: plugin.changed
 
-- name: "[PLUGIN] Place progressive_projects_list plugin"
+- name: "[PLUGIN] Install https://github.com/stgeneral/redmine-progressive-projects-list"
   git:
     repo: https://github.com/stgeneral/redmine-progressive-projects-list.git
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/progressive_projects_list"
@@ -46,7 +49,7 @@
 - include: migrate_plugins.yml
   when: plugin.changed
 
-- name: "[PLUGIN] Place collapsed-journals plugin"
+- name: "[PLUGIN] Install https://github.com/stgeneral/redmine-collapsed-journals"
   git:
     repo: https://github.com/stgeneral/redmine-collapsed-journals.git
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/collapsed_journals"
@@ -56,7 +59,7 @@
   when: plugin.changed
 
 
-- name: "[PLUGIN] Place redmine_timelog_timer plugin"
+- name: "[PLUGIN] Install https://github.com/behigh/redmine_timelog_timer"
   git:
     repo: https://github.com/behigh/redmine_timelog_timer.git
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/timelog_timer"
@@ -65,13 +68,15 @@
 - include: migrate_plugins.yml
   when: plugin.changed
 
-- name: "[PLUGIN] Place line_numbers plugin"
+## for this plugin migrations not needed, as is remember
+- name: "[PLUGIN] Install https://github.com/cdwertmann/line_numbers"
   git:
     repo: https://github.com/cdwertmann/line_numbers.git
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/line_numbers"
     update: no
 
-- name: "[PLUGIN] Place codebutton plugin"
+# Adding some source code hightlight to issues
+- name: "[PLUGIN] Install https://github.com/mediatainment/redmine_codebutton"
   git:
     repo: https://github.com/mediatainment/redmine_codebutton.git
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/codebutton"
@@ -80,24 +85,10 @@
 - include: migrate_plugins.yml
   when: plugin.changed
 
-
-## Vault plugin
-### 1. Adding Rails.application.config.assets.precompile += %w( zeroclipboard.js ) to config/initializers/assets.rb
-- name: "Ensure assets config exist"
-  file:
-    path: /opt/redmine/redmine-3.4.3/config/initializers/assets.rb
-    state: touch
-  changed_when: false
-
-- name: "Add vault .js to assets"
-  lineinfile:
-    path: /opt/redmine/redmine-3.4.3/config/initializers/assets.rb
-    insertbefore: EOF
-    line: "Rails.application.config.assets.precompile += %w( zeroclipboard.js )"
-    state: present
-
-### 2. Installing plugin
-- name: "[PLUGIN] Place vault plugin"
+# Vault plugin
+## After installing a plugin, open the settings ( http://*/settings/plugin/vault ) and enter encryption key in the Encryption key field.
+### 0. Installing plugin
+- name: "[PLUGIN] Install https://noshutdown.ru/en/redmine-plugins-vault/"
   git:
     repo: https://github.com/noshutdown-ru/vault.git
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/vault"
@@ -105,44 +96,58 @@
   register: plugin
 - include: migrate_plugins.yml
   when: plugin.changed
+### 1. Adding Rails.application.config.assets.precompile += %w( zeroclipboard.js ) to config/initializers/assets.rb
+- name: "[PLUGIN configuration] Ensure assets config exist"
+  file:
+    path: "/opt/redmine/redmine-{{ redmine_version }}/config/initializers/assets.rb"
+    state: touch
+  changed_when: false
 
-### After installing a plugin, open the settings ( http://*/settings/plugin/vault ) and enter encryption key in the Encryption key field.
+- name: "[PLUGIN configuration] Add vault .js to assets"
+  lineinfile:
+    path: "/opt/redmine/redmine-{{ redmine_version }}/config/initializers/assets.rb"
+    insertbefore: EOF
+    line: "Rails.application.config.assets.precompile += %w( zeroclipboard.js )"
+    state: present
 
-
-- stat:
+# Scrum
+- name: "[CHECK] Is installed plugin_scrum"
+  stat:
     path: "/opt/redmine/redmine-{{ redmine_version }}/plugins/scrum"
   register: plugin_scrum
 
-- file: path=/opt/redmine/redmine-3.4.3/plugins/scrum state=directory
+- name: "[CHECK] Ensure folder for plugin_scrum exist"
+  file:
+    path: "/opt/redmine/redmine-{{ redmine_version }}/plugins/scrum"
+    state: directory
   when: plugin_scrum.stat.islnk is not defined
 
-- name: "Install http://www.redmine.org/plugins/scrum-plugin"
+- name: "[PLUGIN] Install http://www.redmine.org/plugins/scrum-plugin"
   unarchive:
     src: https://redmine.ociotec.com/attachments/download/476/scrum-v0.18.0.tar.gz
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/"
     remote_src: yes
   register: plugin
   when: plugin_scrum.stat.islnk is not defined
-
 - include: migrate_plugins.yml
   when: plugin.changed == true and plugin_scrum.stat.islnk is not defined
 
-
-- stat:
+# Trello
+- name: "[CHECK] Is installed plugin_trello"
+  stat:
     path: "/opt/redmine/redmine-{{ redmine_version }}/plugins/redmine_trello_card_sync"
   register: redmine_trello_card_sync
 
-- file: path=/opt/redmine/redmine-3.4.3/plugins/scrum state=directory
-  when: redmine_trello_card_sync.stat.islnk is not defined
-
-- unarchive:
+- name: "[PLUGIN] Download https://github.com/KKBOX/redmine-trello-card-sync"
+  unarchive:
     src: https://github.com/KKBOX/redmine-trello-card-sync/archive/master.zip
     dest: /tmp/
     remote_src: yes
   register: plugin
   when: redmine_trello_card_sync.stat.islnk is not defined
 
-- shell: "mv /tmp/redmine-trello-card-sync-master/plugins/redmine_trello_card_sync /opt/redmine/redmine-{{ redmine_version }}/plugins/redmine_trello_card_sync"
+- name: "[PLUGIN] Install https://github.com/KKBOX/redmine-trello-card-sync"
+  shell: "mv /tmp/redmine-trello-card-sync-master/plugins/redmine_trello_card_sync /opt/redmine/redmine-{{ redmine_version }}/plugins/redmine_trello_card_sync"
   when: redmine_trello_card_sync.stat.islnk is not defined
 
 - include: migrate_plugins.yml
