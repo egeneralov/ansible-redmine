@@ -14,7 +14,7 @@
 - include: bundler_install.yml
 
 - name: Redmine database configuration
-  template: 
+  template:
     src: database.yml
     dest: "/opt/redmine/redmine-{{ redmine_version }}/config/database.yml"
     mode: 0775

@@ -10,7 +10,7 @@
     - postgresql-9.6
 
 - name: Ensure redmine db user will have access to psql
-  template: 
+  template:
     src: pg_hba.conf
     dest: /etc/postgresql/9.6/main/pg_hba.conf
     mode: 0660
