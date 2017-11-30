@@ -128,32 +128,22 @@
   when: plugin.changed == true and plugin_scrum.stat.islnk is not defined
 
 
-
-- name: "[PLUGIN] Place task_board plugin"
-  git:
-    repo: https://github.com/netaustin/redmine_task_board.git
-    dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/task_board"
-    update: no
-  register: plugin
-- include: migrate_plugins.yml
-  when: plugin.changed
-
-
-
-
-
-- file:
-    path: "/opt/redmine/redmine-{{ redmine_version }}/plugins/trello_card_sync"
-    state: absent
+- stat:
+    path: "/opt/redmine/redmine-{{ redmine_version }}/plugins/redmine_trello_card_sync"
+  register: redmine_trello_card_sync
 
 - file: path=/opt/redmine/redmine-3.4.3/plugins/scrum state=directory
+  when: redmine_trello_card_sync.stat.islnk is not defined
 
 - unarchive:
     src: https://github.com/KKBOX/redmine-trello-card-sync/archive/master.zip
     dest: /tmp/
     remote_src: yes
   register: plugin
+  when: redmine_trello_card_sync.stat.islnk is not defined
 
 - shell: "mv /tmp/redmine-trello-card-sync-master/plugins/redmine_trello_card_sync /opt/redmine/redmine-{{ redmine_version }}/plugins/redmine_trello_card_sync"
+  when: redmine_trello_card_sync.stat.islnk is not defined
 
 - include: migrate_plugins.yml
+  when: redmine_trello_card_sync.stat.islnk is not defined
