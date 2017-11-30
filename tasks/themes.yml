@@ -6,3 +6,15 @@
     dest: "/opt/redmine/redmine-{{ redmine_version }}/public/themes/"
     remote_src: yes
   changed_when: false
+  with_items:
+    - https://github.com/tsi/redmine-theme-flat/archive/master.zip
+    - https://github.com/themondays/Dwarf/archive/master.zip
+    - https://github.com/mrliptontea/PurpleMine2/archive/master.zip
+    - https://github.com/garex/redmine-theme-axiom/archive/master.zip
+    - https://github.com/pixel-cookers/redmine-theme/archive/master.zip
+    - https://github.com/FabriceSalvaire/redmine-improved-theme/archive/master.zip
+    - https://github.com/akabekobeko/redmine-theme-minimalflat2/archive/master.zip
+    - https://github.com/makotokw/redmine-theme-gitmike/archive/master.zip
+    - https://github.com/jjanusch/minelab/archive/master.zip
+    - https://github.com/stgeneral/redmine-progressive-projects-list/archive/master.zip
+    - https://github.com/stgeneral/redmine-progressive-theme.git
