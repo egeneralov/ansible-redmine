@@ -1,7 +1,9 @@
 ---
 
 - name: "Get info about theme {{ item }}"
-  stat: theme
+  stat:
+    path: "/opt/redmine/redmine-{{ redmine_version }}/public/themes/"
+  register: theme
 
 - name: "Install theme from {{ item }}"
   unarchive:
