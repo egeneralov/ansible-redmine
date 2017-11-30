@@ -13,11 +13,3 @@
     dest: "/opt/redmine/redmine-{{ redmine_version }}/start_bot.sh"
     mode: 0777
   changed_when: false
-
-- include: service_autostart.yml
-  with_items:
-    - redmine
-    - redis-server
-    - sidekiq
-    - redmine-bot
-

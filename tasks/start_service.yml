@@ -4,4 +4,4 @@
   service:
     name: "{{ item }}.service"
     state: started
-
+    enabled: yes
