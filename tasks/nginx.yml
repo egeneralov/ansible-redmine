@@ -7,7 +7,11 @@
   with_items:
     - /etc/nginx/sites-enabled/default
     -  /etc/nginx/sites-available/default
-  when: nginx_installation.changed
+
+- name: Ensure html placeholder exist
+  copy:
+    src: redmine_error.html
+    dest: "/opt/redmine/redmine-{{ redmine_version }}/redmine_error.html"
 
 - name: Place nginx redmine configuration
   template:
