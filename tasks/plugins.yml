@@ -109,46 +109,5 @@
     insertbefore: EOF
     line: "Rails.application.config.assets.precompile += %w( zeroclipboard.js )"
     state: present
+  ignore_errors: true
 
-# Scrum
-- name: "[CHECK] Is installed plugin_scrum"
-  stat:
-    path: "/opt/redmine/redmine-{{ redmine_version }}/plugins/scrum"
-  register: plugin_scrum
-
-- name: "[CHECK] Ensure folder for plugin_scrum exist"
-  file:
-    path: "/opt/redmine/redmine-{{ redmine_version }}/plugins/scrum"
-    state: directory
-  when: plugin_scrum.stat.islnk is not defined
-
-- name: "[PLUGIN] Install http://www.redmine.org/plugins/scrum-plugin"
-  unarchive:
-    src: https://redmine.ociotec.com/attachments/download/476/scrum-v0.18.0.tar.gz
-    dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/"
-    remote_src: yes
-  register: plugin
-  when: plugin_scrum.stat.islnk is not defined
-- include: migrate_plugins.yml
-  when: plugin.changed == true and plugin_scrum.stat.islnk is not defined
-
-# Trello
-- name: "[CHECK] Is installed plugin_trello"
-  stat:
-    path: "/opt/redmine/redmine-{{ redmine_version }}/plugins/redmine_trello_card_sync"
-  register: redmine_trello_card_sync
-
-- name: "[PLUGIN] Download https://github.com/KKBOX/redmine-trello-card-sync"
-  unarchive:
-    src: https://github.com/KKBOX/redmine-trello-card-sync/archive/master.zip
-    dest: /tmp/
-    remote_src: yes
-  register: plugin
-  when: redmine_trello_card_sync.stat.islnk is not defined
-
-- name: "[PLUGIN] Install https://github.com/KKBOX/redmine-trello-card-sync"
-  shell: "mv /tmp/redmine-trello-card-sync-master/plugins/redmine_trello_card_sync /opt/redmine/redmine-{{ redmine_version }}/plugins/redmine_trello_card_sync"
-  when: redmine_trello_card_sync.stat.islnk is not defined
-
-- include: migrate_plugins.yml
-  when: redmine_trello_card_sync.stat.islnk is not defined

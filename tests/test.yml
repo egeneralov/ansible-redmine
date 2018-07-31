@@ -1,5 +1,10 @@
 ---
+
 - hosts: localhost
   remote_user: root
+  vars:
+    domain: redmine.example.org
+    redmine_version: 3.4.3
   roles:
     - egeneralov.redmine
+
