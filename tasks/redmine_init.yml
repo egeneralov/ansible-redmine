@@ -11,8 +11,6 @@
     src: puma.rb
     dest: "/opt/redmine/redmine-{{ redmine_version }}/config/puma.rb"
 
-- include: bundler_install.yml
-
 - name: Redmine database configuration
   template:
     src: database.yml
@@ -22,6 +20,8 @@
     group: "{{ redmine_unix_group }}"
   with_items:
     - "/opt/redmine/redmine-{{ redmine_version }}/config/database.yml"
+
+- include: bundler_install.yml
 
 - name: Migrate database
   shell: bundle exec rake db:migrate
