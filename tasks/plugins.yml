@@ -6,6 +6,7 @@
     repo: "https://github.com/ogom/redmine_sidekiq"
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/redmine_sidekiq"
     update: no
+    version: 4efe5c0b74bc0420349fae063b48462f53f6b4d4
   register: plugin
 - include: migrate_plugins.yml
   when: plugin.changed
@@ -13,13 +14,14 @@
 # Telegram
 - name: "[PLUGIN] Install centosadmin plugin"
   git:
-    repo: "https://github.com/centosadmin/{{ item }}.git"
-    dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/{{ item }}"
+    repo: "https://github.com/centosadmin/{{ item.n }}.git"
+    dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/{{ item.n }}"
+    version: "{{ item.v }}"
     update: no
   with_items:
-    - redmine_telegram_common
-    - redmine_intouch
-    - redmine_2fa
+    - { 'n': 'redmine_telegram_common', 'v': 'f4160eae00c074c5e95f5f6e2c6b1c4c56f7565c' }
+    - { 'n': 'redmine_intouch', 'v': '6c98c59a2d3c869a462e20a33d713bd35108c7cd' }
+    - { 'n': 'redmine_2fa', 'v': '6c98c59a2d3c869a462e20a33d713bd35108c7cd' }
   register: plugin
 - include: migrate_plugins.yml
   when: plugin.changed
@@ -36,6 +38,7 @@
     repo: https://github.com/arkhitech/redmine_mentions.git
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/redmine_mentions"
     update: no
+    versions: af7719ee31f671e98b77c837b950664c3128d33c
   register: plugin
 - include: migrate_plugins.yml
   when: plugin.changed
@@ -45,6 +48,7 @@
     repo: https://github.com/stgeneral/redmine-progressive-projects-list.git
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/progressive_projects_list"
     update: no
+    version: c170a3506a7725cfefab6380a3ed0650391796c3
   register: plugin
 - include: migrate_plugins.yml
   when: plugin.changed
@@ -54,6 +58,7 @@
     repo: https://github.com/stgeneral/redmine-collapsed-journals.git
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/collapsed_journals"
     update: no
+    version: 31cde872499a1cd8a756c15d4862a0fb1d94ee6b
   register: plugin
 - include: migrate_plugins.yml
   when: plugin.changed
@@ -64,6 +69,7 @@
     repo: https://github.com/behigh/redmine_timelog_timer.git
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/timelog_timer"
     update: no
+    version: 4faaa2a8c27e09878e3091713aea96fe5d2f3bff
   register: plugin
 - include: migrate_plugins.yml
   when: plugin.changed
@@ -74,6 +80,7 @@
     repo: https://github.com/cdwertmann/line_numbers.git
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/line_numbers"
     update: no
+    version: 92cfd9cbc90c2ebad288f8b3c8cfb5b62412e857
 
 # Adding some source code hightlight to issues
 - name: "[PLUGIN] Install https://github.com/mediatainment/redmine_codebutton"
@@ -81,6 +88,7 @@
     repo: https://github.com/mediatainment/redmine_codebutton.git
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/codebutton"
     update: no
+    version: 99f716400c38fe44ff45c45cf7d76ee6fcb358cf
   register: plugin
 - include: migrate_plugins.yml
   when: plugin.changed
@@ -93,6 +101,7 @@
     repo: https://github.com/noshutdown-ru/vault.git
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/vault"
     update: no
+    version: 22d0c27b23eea037cc41fa549c8f171f7bed6c95
   register: plugin
 - include: migrate_plugins.yml
   when: plugin.changed
