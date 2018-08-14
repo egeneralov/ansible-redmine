@@ -9,6 +9,10 @@
     - /etc/nginx/sites-available/default
   register: nginx_default
 
+- file:
+    path: "/opt/redmine/redmine-{{ redmine_version }}"
+    state: directory
+
 - name: Ensure html placeholder exist
   copy:
     src: redmine_error.html

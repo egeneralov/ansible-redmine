@@ -1,82 +1,81 @@
 ---
 # tasks file for redmine
+  - name: Install ansible deps (apt)
+    apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+      cache_valid_time: 36000
+    with_items:
+      - python-pip
+      - sudo
 
-- name: Install ansible deps (apt)
-  apt:
-    name: "{{ item }}"
-    state: present
-    update_cache: yes
-    cache_valid_time: 36000
-  with_items:
-    - python-pip
-    - sudo
+  - name: Install ansible deps (pip)
+    pip:
+      name: psycopg2
+      state: present
 
-- name: Install ansible deps (pip)
-  pip:
-    name: psycopg2
-    state: present
+  - name: Install ruby
+    apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+      cache_valid_time: 36000
+    with_items:
+      - ruby
+      - ruby-dev
+      - rails
+      - gem
+      - ruby-zip
+      - imagemagick
 
-- name: Install ruby
-  apt:
-    name: "{{ item }}"
-    state: present
-    update_cache: yes
-    cache_valid_time: 36000
-  with_items:
-    - ruby
-    - ruby-dev
-    - rails
-    - gem
-    - ruby-zip
-    - imagemagick
+  - name: Install build tools
+    apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+      cache_valid_time: 36000
+    with_items:
+      - build-essential
+      - autoconf
+      - checkinstall
+      - zlib1g
+      - zlibc
 
-- name: Install build tools
-  apt:
-    name: "{{ item }}"
-    state: present
-    update_cache: yes
-    cache_valid_time: 36000
-  with_items:
-    - build-essential
-    - autoconf
-    - checkinstall
-    - zlib1g
-    - zlibc
+  - name: Install libs sources
+    apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+      cache_valid_time: 36000
+    with_items:
+      - zlib1g-dev
+      - libssl-dev
+      - libyaml-dev
+      - libcurl4-openssl-dev
+      - libapr1-dev
+      - libxslt1-dev
+      - libxml2-dev
+      - libmagickwand-dev
 
-- name: Install libs sources
-  apt:
-    name: "{{ item }}"
-    state: present
-    update_cache: yes
-    cache_valid_time: 36000
-  with_items:
-    - zlib1g-dev
-    - libssl-dev
-    - libyaml-dev
-    - libcurl4-openssl-dev
-    - libapr1-dev
-    - libxslt1-dev
-    - libxml2-dev
-    - libmagickwand-dev
+  - name: Ensure nginx installed
+    apt:
+      name: nginx
+      state: installed
+      update_cache: yes
+      cache_valid_time: 36000
+    register: nginx_installation
 
-- name: Ensure nginx installed
-  apt:
-    name: nginx
-    state: installed
-    update_cache: yes
-    cache_valid_time: 36000
-  register: nginx_installation
+  - name: Install redis
+    apt:
+      name: redis-server
+      state: installed
+      update_cache: yes
+      cache_valid_time: 36000
 
-- name: Install redis
-  apt:
-    name: redis-server
-    state: installed
-    update_cache: yes
-    cache_valid_time: 36000
-
-- name: Install git
-  apt:
-    name: git
-    state: installed
-    update_cache: yes
-    cache_valid_time: 36000
+  - name: Install git
+    apt:
+      name: git
+      state: installed
+      update_cache: yes
+      cache_valid_time: 36000
