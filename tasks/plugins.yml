@@ -21,7 +21,7 @@
   with_items:
     - { 'n': 'redmine_telegram_common', 'v': 'f4160eae00c074c5e95f5f6e2c6b1c4c56f7565c' }
     - { 'n': 'redmine_intouch', 'v': '6c98c59a2d3c869a462e20a33d713bd35108c7cd' }
-    - { 'n': 'redmine_2fa', 'v': '6c98c59a2d3c869a462e20a33d713bd35108c7cd' }
+    - { 'n': 'redmine_2fa', 'v': 'c5467824d819edad45e36ee16adca4697ffdb581' }
   register: plugin
 - include: migrate_plugins.yml
   when: plugin.changed
