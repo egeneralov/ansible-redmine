@@ -38,7 +38,7 @@
     repo: https://github.com/arkhitech/redmine_mentions.git
     dest: "/opt/redmine/redmine-{{ redmine_version }}/plugins/redmine_mentions"
     update: no
-    versions: af7719ee31f671e98b77c837b950664c3128d33c
+    version: af7719ee31f671e98b77c837b950664c3128d33c
   register: plugin
 - include: migrate_plugins.yml
   when: plugin.changed
